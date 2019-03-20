@@ -6,6 +6,9 @@ class PokemonSinglePage extends Component {
   state = {
     pokemon: {
       name: '',
+      height: 0,
+      weight: 0,
+      abilities: [],
       sprites: {
         front_default: ''
       }
@@ -14,10 +17,17 @@ class PokemonSinglePage extends Component {
 
   componentDidMount() {
     const { pokemonId } = this.props.match.params;
-
-    loadData(`pokemon/${pokemonId}`).then(data => {
-      this.setState({ pokemon: data });
-    });
+    const localPokemon = localStorage.getItem('pokemon');
+    if (!localPokemon) {
+      loadData(`pokemon/${pokemonId}`).then(data => {
+        this.setState({ pokemon: data });
+      });
+    } else {
+      const pokemon = JSON.parse(localPokemon).find(pokemon => {
+        return pokemon.name === pokemonId
+      });
+      this.setState({ pokemon });
+    }
   }
 
   render() {

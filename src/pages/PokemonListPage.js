@@ -6,13 +6,42 @@ import PokemonListItem from '../components/PokemonListItem';
 class PokemonListPage extends Component {
   state = {
     allPokemon: [],
-    myPokemon: []
+    myPokemon: [],
+    filters: {}
   };
 
   componentDidMount() {
-    loadData('pokemon').then(data => {
-      this.setState({ allPokemon: data.results });
+    const localPokemon = localStorage.getItem('pokemon');
+    if (!localPokemon) {
+      this.fetchPokemon().then(allPokemon => {
+        this.setState({ allPokemon });
+        localStorage.setItem('pokemon', JSON.stringify(allPokemon));
+      })
+    } else {
+      this.setState({ allPokemon: JSON.parse(localPokemon) })
+    }
+  }
+
+  fetchPokemon() {
+    return loadData('pokemon').then(async data => {
+      const promisedPokemonList = data.results.map(pokemon => {
+        return loadData(`pokemon/${pokemon.name}`)
+      })
+      const fullPokemonList = await Promise.all(promisedPokemonList)
+      return fullPokemonList;
     });
+  }
+
+  toggleMyPokemon(pokemonId) {
+    if (this.state.myPokemon.includes(pokemonId)) {
+      this.setState(prevState => ({
+        myPokemon: prevState.myPokemon.filter(id => id === pokemonId)
+      }));
+    } else {
+      this.setState(prevState => ({
+        myPokemon: prevState.myPokemon.concat(pokemonId)
+      }));
+    }
   }
 
   render() {
