@@ -17,7 +17,7 @@ class Filters extends Component {
   }
 
   isSelected(type) {
-    return this.props.activeFilters && this.props.activeFilters.has(type);
+    return this.props.activeFilter && this.props.activeFilter === type;
   }
 
   render() {
@@ -42,7 +42,7 @@ class Filters extends Component {
 
 Filters.propTypes = {
   toggleFilter: PropTypes.func.isRequired,
-  activeFilters: PropTypes.objectOf(Set)
+  activeFilter: PropTypes.string,
 };
 
 export default Filters;

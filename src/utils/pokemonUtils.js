@@ -18,9 +18,6 @@ export function adaptPokemonData(pokemonList) {
       abilities: pokemon.abilities.map(ability => {
         return ability.ability.name;
       }),
-      moves: pokemon.moves.map(move => {
-        return move.move.name;
-      }),
       imageSrc: pokemon.sprites.front_default
     };
   });
@@ -33,17 +30,9 @@ export function adaptPokemonData(pokemonList) {
  * @returns {Array}
  */
 
-export function filterPokemon(pokemonList, activeFilters) {
-  if (activeFilters.size === 0) {
-    return pokemonList;
-  }
-
-  let filteredPokemon = pokemonList;
-  activeFilters.forEach(filter => {
-    filteredPokemon = filteredPokemon.filter(pokemon => {
-      return pokemon.types.includes(filter);
-    })
-  });
-
-  return filteredPokemon;
+export function filterPokemon(pokemonList, activeFilter) {
+  if (!activeFilter) return pokemonList;
+  return pokemonList.filter(pokemon =>  {
+    return pokemon.types.includes(activeFilter);
+  })
 }

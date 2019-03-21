@@ -13,9 +13,10 @@ class PokemonListPage extends Component {
     this.state = {
       allPokemon: [],
       myPokemonIds: new Set(),
-      filters: new Set(),
+      filter: null,
       pokemonCount: 0,
-      nextPageUrl: `${apiRoot}pokemon`
+      nextPageUrl: `${apiRoot}pokemon?limit=50`,
+      finishedLoading: false
     };
   }
 
@@ -38,7 +39,9 @@ class PokemonListPage extends Component {
     if (localAllPokemon && localAllPokemon.length > 0) {
       this.setState({
         allPokemon: localAllPokemon,
-        nextPageUrl: `${apiRoot}pokemon?offset=${localAllPokemon.length}`
+        nextPageUrl: `${apiRoot}pokemon?offset=${
+          localAllPokemon.length
+        }&limit=50`
       });
     }
 
@@ -70,6 +73,7 @@ class PokemonListPage extends Component {
           !this.state.nextPageUrl
         ) {
           this.observer.disconnect();
+          this.setState({ finishedLoading: true });
         }
       });
     });
@@ -95,32 +99,35 @@ class PokemonListPage extends Component {
   }
 
   toggleMyPokemon = pokemonId => {
-    const myPokemon = toggleInSet(this.state.myPokemon, pokemonId);
+    const myPokemon = toggleInSet(this.state.myPokemonIds, pokemonId);
     this.setState({ myPokemon });
   };
 
   toggleTypeFilter = filter => {
-    const filters = toggleInSet(this.state.filters, filter);
-    this.setState({ filters });
+    if (this.state.filter === filter) {
+      this.setState({ filter: null });
+    } else {
+      this.setState({ filter });
+    }
   };
 
   render() {
     const { activeTab } = this.props;
-    const { allPokemon, myPokemonIds, filters } = this.state;
+    const { allPokemon, myPokemonIds, filter, finishedLoading } = this.state;
 
     let filteredPokemon;
     if (activeTab === 'allPokemon') {
-      filteredPokemon = filterPokemon(allPokemon, filters);
+      filteredPokemon = filterPokemon(allPokemon, filter);
     } else if (activeTab === 'myPokemon') {
       const myPokemon = allPokemon.filter(pokemon => {
         return myPokemonIds.has(pokemon.id);
       });
-      filteredPokemon = filterPokemon(myPokemon, filters);
+      filteredPokemon = filterPokemon(myPokemon, filter);
     }
 
     return (
       <div>
-        <Filters toggleFilter={this.toggleTypeFilter} activeFilters={filters} />
+        <Filters toggleFilter={this.toggleTypeFilter} activeFilter={filter} />
         {filteredPokemon.map(pokemon => (
           <PokemonListItem
             key={pokemon.name}
@@ -129,7 +136,9 @@ class PokemonListPage extends Component {
             myPokemon={myPokemonIds.has(pokemon.id)}
           />
         ))}
-        <div ref={this.endRef}>Loading</div>
+        {!finishedLoading && (
+          <div ref={this.endRef}>Loading more pokemon...</div>
+        )}
       </div>
     );
   }

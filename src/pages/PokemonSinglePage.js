@@ -13,9 +13,9 @@ class PokemonSinglePage extends Component {
       weight: 0,
       types: [],
       abilities: [],
-      moves: [],
       imageSrc: ''
-    }
+    },
+    description: ''
   };
 
   componentDidMount() {
@@ -27,20 +27,48 @@ class PokemonSinglePage extends Component {
       });
     } else {
       const pokemon = JSON.parse(localPokemon).find(pokemon => {
-        return pokemon.name === pokemonId
+        return pokemon.name === pokemonId;
       });
       this.setState({ pokemon });
     }
+
+    loadData(`${apiRoot}pokemon-species/${pokemonId}`).then(data => {
+      const enEntry = data.flavor_text_entries.find(entry => {
+        return entry.language.name === 'en';
+      });
+      this.setState({ description: enEntry.flavor_text });
+    });
   }
 
   render() {
-    const { name, imageSrc, types } = this.state.pokemon;
+    const {
+      name,
+      imageSrc,
+      types,
+      abilities,
+      base_experience,
+      height,
+      weight
+    } = this.state.pokemon;
+    const { description } = this.state;
 
     return (
       <div>
         <h1>{capitalize(name)}</h1>
         <img src={imageSrc} alt={`${capitalize(name)}`} />
-        <SimpleList listTitle="Types:" listItems= {types}/>
+        <h2>Description</h2>
+        <p>{description}</p>
+        <SimpleList listTitle="Types:" listItems={types} />
+        <SimpleList listTitle="Abilities:" listItems={abilities} />
+        <p>
+          <strong>Base experience:</strong> {base_experience}
+        </p>
+        <p>
+          <strong>Height:</strong> {height}
+        </p>
+        <p>
+          <strong>Weight:</strong> {weight}
+        </p>
       </div>
     );
   }
