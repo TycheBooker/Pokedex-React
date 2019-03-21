@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { capitalize } from '../utils/generalUtils';
 import { loadData } from '../utils/fetchUtils';
+import SimpleList from '../components/SimpleList';
 
 class PokemonSinglePage extends Component {
   state = {
@@ -9,6 +10,7 @@ class PokemonSinglePage extends Component {
       height: 0,
       weight: 0,
       abilities: [],
+      type: [],
       sprites: {
         front_default: ''
       }
@@ -31,12 +33,13 @@ class PokemonSinglePage extends Component {
   }
 
   render() {
-    const { name, sprites } = this.state.pokemon;
+    const { name, sprites, type } = this.state.pokemon;
 
     return (
       <div>
         <h1>{capitalize(name)}</h1>
         <img src={sprites.front_default} alt={`${capitalize(name)}`} />
+        <SimpleList listTitle="Types:" listItems= {type}/>
       </div>
     );
   }

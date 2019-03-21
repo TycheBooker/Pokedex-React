@@ -8,7 +8,7 @@ import Filters from '../components/Filters';
 class PokemonListPage extends Component {
   state = {
     allPokemon: [],
-    myPokemon: [],
+    myPokemonIds: [],
     filters: {}
   };
 
@@ -25,13 +25,20 @@ class PokemonListPage extends Component {
     }
 
     if (localMyPokemon) {
-      this.setState({ myPokemon: JSON.parse(localMyPokemon) });
+      this.setState({ myPokemonIds: JSON.parse(localMyPokemon) });
     }
+
+    window.addEventListener('beforeunload', this.saveDataToStorage);
   }
 
   componentWillUnmount() {
+    this.saveDataToStorage();
+    window.removeEventListener('beforeunload', this.saveDataToStorage);
+  }
+
+  saveDataToStorage = () => {
     localStorage.setItem('allPokemon', JSON.stringify(this.state.allPokemon));
-    localStorage.setItem('myPokemon', JSON.stringify(this.state.myPokemon));
+    localStorage.setItem('myPokemon', JSON.stringify(this.state.myPokemonIds));
   }
 
   fetchPokemon() {
@@ -44,21 +51,30 @@ class PokemonListPage extends Component {
     });
   }
 
-  toggleMyPokemon = (pokemonId) => {
-    if (this.state.myPokemon.includes(pokemonId)) {
+  toggleMyPokemon = pokemonId => {
+    if (this.state.myPokemonIds.includes(pokemonId)) {
       this.setState(prevState => ({
-        myPokemon: prevState.myPokemon.filter(id => id !== pokemonId)
+        myPokemonIds: prevState.myPokemonIds.filter(id => id !== pokemonId)
       }));
     } else {
       this.setState(prevState => ({
-        myPokemon: prevState.myPokemon.concat([pokemonId])
+        myPokemonIds: prevState.myPokemonIds.concat([pokemonId])
       }));
     }
-  }
+  };
 
   render() {
-    const { allPokemon, filters } = this.state;
-    const filteredPokemon = filterPokemon(allPokemon, filters);
+    const { activeTab } = this.props;
+    const { allPokemon, myPokemonIds, filters } = this.state;
+    let filteredPokemon;
+    if (activeTab === 'allPokemon') {
+      filteredPokemon = filterPokemon(allPokemon, filters);
+    } else if (activeTab === 'myPokemon') {
+      const myPokemon = allPokemon.filter(pokemon => {
+        return myPokemonIds.includes(pokemon.id);
+      });
+      filteredPokemon = filterPokemon(myPokemon, filters);
+    }
 
     return (
       <div>
@@ -68,6 +84,7 @@ class PokemonListPage extends Component {
             key={pokemon.name}
             pokemon={pokemon}
             toggleMyPokemon={this.toggleMyPokemon}
+            myPokemon={myPokemonIds.includes(pokemon.id)}
           />
         ))}
       </div>
