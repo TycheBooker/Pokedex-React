@@ -1,42 +1,49 @@
 /**
- * Adapts data from api for easier filtering
+ * Adapts data from api for easier filtering and lighter storage
  * @param {Array} pokemonList
  * @returns {Array}
  */
 
 export function adaptPokemonData(pokemonList) {
   return pokemonList.map(pokemon => {
-    pokemon.type = pokemon.types.map(type => {
-      return type.type.name;
-    });
-    return pokemon;
+    return {
+      id: pokemon.id,
+      name: pokemon.name,
+      base_experience: pokemon.name.base_experience,
+      height: pokemon.height,
+      weight: pokemon.weight,
+      types: pokemon.types.map(type => {
+        return type.type.name;
+      }),
+      abilities: pokemon.abilities.map(ability => {
+        return ability.ability.name;
+      }),
+      moves: pokemon.moves.map(move => {
+        return move.move.name;
+      }),
+      imageSrc: pokemon.sprites.front_default
+    };
   });
 }
 
 /**
- * Filters a list of objects to match all the given filters
+ * Filters pokemon by type
  * @param {Array.<Object>} pokemonList
- * @param {Object} filters
+ * @param {Set} filters
  * @returns {Array}
  */
 
-export function filterPokemon(pokemonList, filters) {
-  return pokemonList.filter(pokemon => {
-    if (Object.keys(filters).length === 0) {
-      return true;
-    }
-    for (const filter in filters) {
-      if (!pokemon[filter]) return false;
-      if (pokemon[filter] === filters[filter]) {
-        return true;
-      }
-      if (
-        Array.isArray(pokemon[filter]) &&
-        pokemon[filter].includes(filters[filter])
-      ) {
-        return true;
-      }
-    }
-    return false;
+export function filterPokemon(pokemonList, activeFilters) {
+  if (activeFilters.size === 0) {
+    return pokemonList;
+  }
+
+  let filteredPokemon = pokemonList;
+  activeFilters.forEach(filter => {
+    filteredPokemon = filteredPokemon.filter(pokemon => {
+      return pokemon.types.includes(filter);
+    })
   });
+
+  return filteredPokemon;
 }

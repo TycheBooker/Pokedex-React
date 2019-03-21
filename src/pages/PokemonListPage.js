@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { loadData } from '../utils/fetchUtils';
+import { loadData, apiRoot } from '../utils/fetchUtils';
 import { adaptPokemonData, filterPokemon } from '../utils/pokemonUtils';
+import { toggleInSet } from '../utils/generalUtils';
 import PokemonListItem from '../components/PokemonListItem';
 import Filters from '../components/Filters';
 
@@ -9,13 +10,12 @@ class PokemonListPage extends Component {
   constructor(props) {
     super(props);
     this.endRef = React.createRef();
-    this.apiRoot = 'https://pokeapi.co/api/v2/'
     this.state = {
       allPokemon: [],
-      myPokemonIds: [],
-      filters: {},
+      myPokemonIds: new Set(),
+      filters: new Set(),
       pokemonCount: 0,
-      nextPageUrl: `${this.apiRoot}pokemon`
+      nextPageUrl: `${apiRoot}pokemon`
     };
   }
 
@@ -38,7 +38,7 @@ class PokemonListPage extends Component {
     if (localAllPokemon && localAllPokemon.length > 0) {
       this.setState({
         allPokemon: localAllPokemon,
-        nextPageUrl: `${this.apiRoot}pokemon?offset=${localAllPokemon.length}`
+        nextPageUrl: `${apiRoot}pokemon?offset=${localAllPokemon.length}`
       });
     }
 
@@ -54,7 +54,7 @@ class PokemonListPage extends Component {
     this.observer.observe(this.endRef.current);
   }
 
-  onIntersection = (entries) => {
+  onIntersection = entries => {
     entries.forEach(entry => {
       if (entry.intersectionRatio <= 0) {
         return;
@@ -65,11 +65,13 @@ class PokemonListPage extends Component {
           allPokemon: prevState.allPokemon.concat(allPokemon)
         }));
 
-        if (this.state.allPokemon.length >= this.state.pokemonCount || !this.state.nextPageUrl) {
+        if (
+          this.state.allPokemon.length >= this.state.pokemonCount ||
+          !this.state.nextPageUrl
+        ) {
           this.observer.disconnect();
         }
       });
-
     });
   };
 
@@ -83,9 +85,9 @@ class PokemonListPage extends Component {
       this.setState({
         nextPageUrl: data.next,
         pokemonCount: data.count
-      })
+      });
       const promisedPokemonList = data.results.map(pokemon => {
-        return loadData(`${this.apiRoot}pokemon/${pokemon.name}`);
+        return loadData(`${apiRoot}pokemon/${pokemon.name}`);
       });
       const fullPokemonList = await Promise.all(promisedPokemonList);
       return adaptPokemonData(fullPokemonList);
@@ -93,15 +95,13 @@ class PokemonListPage extends Component {
   }
 
   toggleMyPokemon = pokemonId => {
-    if (this.state.myPokemonIds.includes(pokemonId)) {
-      this.setState(prevState => ({
-        myPokemonIds: prevState.myPokemonIds.filter(id => id !== pokemonId)
-      }));
-    } else {
-      this.setState(prevState => ({
-        myPokemonIds: prevState.myPokemonIds.concat([pokemonId])
-      }));
-    }
+    const myPokemon = toggleInSet(this.state.myPokemon, pokemonId);
+    this.setState({ myPokemon });
+  };
+
+  toggleTypeFilter = filter => {
+    const filters = toggleInSet(this.state.filters, filter);
+    this.setState({ filters });
   };
 
   render() {
@@ -113,20 +113,20 @@ class PokemonListPage extends Component {
       filteredPokemon = filterPokemon(allPokemon, filters);
     } else if (activeTab === 'myPokemon') {
       const myPokemon = allPokemon.filter(pokemon => {
-        return myPokemonIds.includes(pokemon.id);
+        return myPokemonIds.has(pokemon.id);
       });
       filteredPokemon = filterPokemon(myPokemon, filters);
     }
 
     return (
       <div>
-        <Filters />
+        <Filters toggleFilter={this.toggleTypeFilter} activeFilters={filters} />
         {filteredPokemon.map(pokemon => (
           <PokemonListItem
             key={pokemon.name}
             pokemon={pokemon}
             toggleMyPokemon={this.toggleMyPokemon}
-            myPokemon={myPokemonIds.includes(pokemon.id)}
+            myPokemon={myPokemonIds.has(pokemon.id)}
           />
         ))}
         <div ref={this.endRef}>Loading</div>

@@ -5,13 +5,13 @@ import { capitalize } from '../utils/generalUtils';
 
 const PokemonListItem = props => {
   const { toggleMyPokemon, myPokemon } = props;
-  const { name, sprites, id } = props.pokemon;
+  const { name, imageSrc, id } = props.pokemon;
 
   return (
     <div>
       <Link to={`/pokemon/${name}`}>
         <h3>{capitalize(name)}</h3>
-        <img src={sprites.front_default} alt={`${capitalize(name)}`} />
+        <img src={imageSrc} alt={`${capitalize(name)}`} />
       </Link>
       <button
         className={myPokemon ? 'red' : ''}

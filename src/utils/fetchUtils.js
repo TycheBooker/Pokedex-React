@@ -1,3 +1,5 @@
+export const apiRoot = 'https://pokeapi.co/api/v2/'
+
 /**
 * Data loader with error handler
 * @param {String} url
