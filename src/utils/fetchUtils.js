@@ -1,13 +1,11 @@
 /**
-* Data loader with error handler and default apiUrl
+* Data loader with error handler
 * @param {String} url
 * @returns {Promise}
 */
 
 export function loadData(path) {
-  const apiUrl = 'https://pokeapi.co/api/v2/';
-
-  return fetch(apiUrl + path)
+  return fetch(path)
     .then(response => {
       if (response.status !== 200) {
         console.error(
