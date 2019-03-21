@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { loadData } from '../utils/fetchUtils';
+import { adaptPokemonData, filterPokemon } from "../utils/pokemonUtils";
 import PokemonListItem from '../components/PokemonListItem';
 
 class PokemonListPage extends Component {
   state = {
     allPokemon: [],
     myPokemon: [],
-    filters: {}
+    filters: {
+      type: 'flying'
+    }
   };
 
   componentDidMount() {
     const localPokemon = localStorage.getItem('pokemon');
     if (!localPokemon) {
       this.fetchPokemon().then(allPokemon => {
+        console.log(allPokemon);
         this.setState({ allPokemon });
         localStorage.setItem('pokemon', JSON.stringify(allPokemon));
       })
@@ -28,7 +32,7 @@ class PokemonListPage extends Component {
         return loadData(`pokemon/${pokemon.name}`)
       })
       const fullPokemonList = await Promise.all(promisedPokemonList)
-      return fullPokemonList;
+      return adaptPokemonData(fullPokemonList);
     });
   }
 
@@ -45,11 +49,12 @@ class PokemonListPage extends Component {
   }
 
   render() {
-    const { allPokemon } = this.state;
+    const { allPokemon, filters } = this.state;
+    const filteredPokemon = filterPokemon(allPokemon, filters);
 
     return (
       <div>
-        {allPokemon.map(pokemon => (
+        {filteredPokemon.map(pokemon => (
           <PokemonListItem key={pokemon.name} pokemon={pokemon} />
         ))}
       </div>

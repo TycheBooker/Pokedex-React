@@ -1,3 +1,9 @@
+/**
+* Data loader with error handler and default apiUrl
+* @param {String} url
+* @returns {Promise}
+*/
+
 export function loadData(path) {
   const apiUrl = 'https://pokeapi.co/api/v2/';
 
