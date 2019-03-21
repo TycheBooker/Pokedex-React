@@ -22,6 +22,9 @@ export function adaptPokemonData(pokemonList) {
 
 export function filterPokemon(pokemonList, filters) {
   return pokemonList.filter(pokemon => {
+    if (Object.keys(filters).length === 0) {
+      return true;
+    }
     for (const filter in filters) {
       if (!pokemon[filter]) return false;
       if (pokemon[filter] === filters[filter]) {

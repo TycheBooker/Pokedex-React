@@ -17,7 +17,7 @@ class PokemonSinglePage extends Component {
 
   componentDidMount() {
     const { pokemonId } = this.props.match.params;
-    const localPokemon = localStorage.getItem('pokemon');
+    const localPokemon = localStorage.getItem('allPokemon');
     if (!localPokemon) {
       loadData(`pokemon/${pokemonId}`).then(data => {
         this.setState({ pokemon: data });
