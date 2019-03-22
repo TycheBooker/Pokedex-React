@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { capitalize } from '../utils/generalUtils';
-import { ReactComponent as Pokeball } from '../img/pokeball.svg'
+import { ReactComponent as Pokeball } from '../img/pokeball.svg';
 
 const PokemonListItem = props => {
   const { toggleMyPokemon, myPokemon } = props;
@@ -16,16 +16,18 @@ const PokemonListItem = props => {
         </h3>
         <img src={imageSrc} alt={`${capitalize(name)}`} />
       </Link>
-      <button
-        className={`pokeball-button ${myPokemon ? 'active' : ''}`}
-        onClick={() => toggleMyPokemon(id)}
-      >
-        <Pokeball width='20px' height='20px'/>
-      </button>
-      <div className="pokemon-types">
-        {types.map(type => (
-          <span key={type}>{type}</span>
-        ))}
+      <div>
+        <button
+          className={`pokeball-button ${myPokemon ? 'active' : ''}`}
+          onClick={() => toggleMyPokemon(id)}
+        >
+          <Pokeball width="20px" height="20px" />
+        </button>
+        <div className="pokemon-types">
+          {types.map(type => (
+            <span key={type}>{type}</span>
+          ))}
+        </div>
       </div>
     </div>
   );

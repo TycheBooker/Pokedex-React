@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { capitalize } from '../utils/generalUtils';
 import { loadData, apiRoot } from '../utils/fetchUtils';
+import { adaptPokemonObject } from "../utils/pokemonUtils";
 import SimpleList from '../components/SimpleList';
 
 class PokemonSinglePage extends Component {
@@ -23,8 +24,8 @@ class PokemonSinglePage extends Component {
     const localPokemon = localStorage.getItem('allPokemon');
     if (!localPokemon) {
       loadData(`${apiRoot}pokemon/${pokemonId}`).then(data => {
-        console.log(data);
-        this.setState({ pokemon: data });
+        const pokemon = adaptPokemonObject(data);
+        this.setState({ pokemon });
       });
     } else {
       const pokemon = JSON.parse(localPokemon).find(pokemon => {

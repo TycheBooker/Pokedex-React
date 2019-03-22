@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { loadData, apiRoot } from '../utils/fetchUtils';
-import { adaptPokemonData, filterPokemon } from '../utils/pokemonUtils';
+import { adaptPokemonObject, filterPokemon } from '../utils/pokemonUtils';
 import { toggleInSet } from '../utils/generalUtils';
 import PokemonListItem from '../components/PokemonListItem';
 import Filters from '../components/Filters';
@@ -46,7 +46,8 @@ class PokemonListPage extends Component {
     }
 
     if (localMyPokemon && localMyPokemon.length > 0) {
-      this.setState({ myPokemonIds: localMyPokemon });
+      const myPokemonIds = new Set(localMyPokemon)
+      this.setState({ myPokemonIds });
     }
   }
 
@@ -81,7 +82,7 @@ class PokemonListPage extends Component {
 
   saveDataToStorage = () => {
     localStorage.setItem('allPokemon', JSON.stringify(this.state.allPokemon));
-    localStorage.setItem('myPokemon', JSON.stringify(this.state.myPokemonIds));
+    localStorage.setItem('myPokemon', JSON.stringify(Array.from(this.state.myPokemonIds)));
   };
 
   fetchPokemon() {
@@ -94,7 +95,10 @@ class PokemonListPage extends Component {
         return loadData(`${apiRoot}pokemon/${pokemon.name}`);
       });
       const fullPokemonList = await Promise.all(promisedPokemonList);
-      return adaptPokemonData(fullPokemonList);
+      const adaptedPokemonList = fullPokemonList.map(pokemon => {
+        return adaptPokemonObject(pokemon);
+      })
+      return adaptedPokemonList;
     });
   }
 

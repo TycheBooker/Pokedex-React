@@ -1,26 +1,24 @@
 /**
  * Adapts data from api for easier filtering and lighter storage
- * @param {Array} pokemonList
- * @returns {Array}
+ * @param {Object} pokemon
+ * @returns {Oject}
  */
 
-export function adaptPokemonData(pokemonList) {
-  return pokemonList.map(pokemon => {
-    return {
-      id: pokemon.id,
-      name: pokemon.name,
-      base_experience: pokemon.base_experience,
-      height: pokemon.height,
-      weight: pokemon.weight,
-      types: pokemon.types.map(type => {
-        return type.type.name;
-      }),
-      abilities: pokemon.abilities.map(ability => {
-        return ability.ability.name;
-      }),
-      imageSrc: pokemon.sprites.front_default
-    };
-  });
+export function adaptPokemonObject(pokemon) {
+  return {
+    id: pokemon.id,
+    name: pokemon.name,
+    base_experience: pokemon.base_experience,
+    height: pokemon.height,
+    weight: pokemon.weight,
+    types: pokemon.types.map(type => {
+      return type.type.name;
+    }),
+    abilities: pokemon.abilities.map(ability => {
+      return ability.ability.name;
+    }),
+    imageSrc: pokemon.sprites.front_default
+  };
 }
 
 /**
