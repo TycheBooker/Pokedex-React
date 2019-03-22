@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { capitalize } from '../utils/generalUtils';
 import { loadData, apiRoot } from '../utils/fetchUtils';
-import { adaptPokemonObject } from "../utils/pokemonUtils";
+import { adaptPokemonObject } from '../utils/pokemonUtils';
 import SimpleList from '../components/SimpleList';
 
 class PokemonSinglePage extends Component {
@@ -63,13 +63,13 @@ class PokemonSinglePage extends Component {
         </div>
         <div className="pokemon-single-stats">
           <p>
-          <strong>Base experience:</strong> {base_experience}
+            <strong>Base experience:</strong> {base_experience}
           </p>
           <p>
-          <strong>Height:</strong> {height}
+            <strong>Height:</strong> {height}
           </p>
           <p>
-          <strong>Weight:</strong> {weight}
+            <strong>Weight:</strong> {weight}
           </p>
         </div>
         <SimpleList listTitle="Types:" listItems={types} />
