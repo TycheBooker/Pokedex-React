@@ -72,7 +72,7 @@ class PokemonListPage extends Component {
   };
 
   addPokemon(pokemonIds) {
-    const newPokemon = filterLoaded(pokemonIds, this.state.allPokemon);
+    let newPokemon = filterLoaded(pokemonIds, this.state.allPokemon);
     fetchPokemon(newPokemon).then(allPokemon => {
       this.setState(prevState => ({
         allPokemon: prevState.allPokemon.concat(allPokemon)
@@ -95,12 +95,13 @@ class PokemonListPage extends Component {
     if (this.state.filter === filter.name) {
       this.setState({ filter: null });
     } else {
-      loadData(filter.url).then(data => {
-        const pokemonIds = data.pokemon.map(pokemon => {
-          return pokemon.pokemon.name;
-        });
-        this.addPokemon(pokemonIds);
-      });
+      // TODO - too heavy on the api, add front side pagination for filtered results
+      // loadData(filter.url).then(data => {
+      //   const pokemonIds = data.pokemon.map(pokemon => {
+      //     return pokemon.pokemon.name;
+      //   });
+      //   this.addPokemon(pokemonIds);
+      // });
 
       this.setState({ filter: filter.name });
     }
@@ -120,7 +121,7 @@ class PokemonListPage extends Component {
       filteredPokemon = filterPokemon(myPokemon, filter);
     }
 
-    const showLoadButton = !finishedLoading && activeTab !== 'myPokemon' && !filter;
+    const showLoadButton = !finishedLoading && activeTab !== 'myPokemon';
 
     return (
       <div>
