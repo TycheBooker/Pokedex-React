@@ -1,0 +1,21 @@
+.simple-list {
+  margin-bottom: 10px;
+
+  h4 {
+    color: $blue;
+    font-weight: bold;
+  }
+}
+
+.simple-list-list {
+  display: flex;
+  flex-wrap: wrap;
+
+  li {
+    color: $dark-grey;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin: 5px;
+  }
+}
+

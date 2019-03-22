@@ -1,0 +1,19 @@
+.nav-header {
+  display: flex;
+  background-color: $light-grey;
+  color: $white;
+
+  a {
+    flex: 1 0 1%;
+    color: $white;
+    font-size: 16px;
+    padding: 10px;
+    text-align: center;
+    transition: background-color, 0.3s;
+
+    &:hover,
+    &.active {
+      background-color: $dark-grey;
+    }
+  }
+}

@@ -1,0 +1,30 @@
+.pokemon-single {
+  padding: 5px;
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+}
+
+.pokemon-single-heading {
+  display: flex;
+  align-items: center;
+
+  p {
+    font-size: 14px;
+  }
+}
+
+.pokemon-single-stats {
+  margin-bottom: 20px;
+
+  p {
+    margin-bottom: 10px;
+  }
+
+  strong {
+    color: $blue;
+    font-weight: bold;
+  }
+}

@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { loadData, apiRoot } from '../utils/fetchUtils';
 
 class Filters extends Component {
   state = {
-    types: []
+    types: [],
+    open: false
   };
 
   componentDidMount() {
@@ -16,33 +17,44 @@ class Filters extends Component {
     });
   }
 
+  toggleOpen = () => {
+    this.setState(prevState => ({
+      open: !prevState.open
+    }));
+  };
+
   isSelected(type) {
     return this.props.activeFilter && this.props.activeFilter === type;
   }
 
   render() {
-    const { types } = this.state;
+    const { types, open } = this.state;
     const { toggleFilter } = this.props;
 
     return (
-      <div>
-        {types.map(type => (
-          <button
-            key={type}
-            className={this.isSelected(type) ? 'red' : ''}
-            onClick={() => toggleFilter(type)}
-          >
-            {type}
-          </button>
-        ))}
-      </div>
+      <Fragment>
+        <button onClick={this.toggleOpen} className="filters-header">Filters</button>
+        {open && (
+          <div className="filters">
+            {types.map(type => (
+              <button
+                key={type}
+                className={this.isSelected(type) ? 'active' : ''}
+                onClick={() => toggleFilter(type)}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        )}
+      </Fragment>
     );
   }
 }
 
 Filters.propTypes = {
   toggleFilter: PropTypes.func.isRequired,
-  activeFilter: PropTypes.string,
+  activeFilter: PropTypes.string
 };
 
 export default Filters;

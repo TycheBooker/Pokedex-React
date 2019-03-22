@@ -23,6 +23,7 @@ class PokemonSinglePage extends Component {
     const localPokemon = localStorage.getItem('allPokemon');
     if (!localPokemon) {
       loadData(`${apiRoot}pokemon/${pokemonId}`).then(data => {
+        console.log(data);
         this.setState({ pokemon: data });
       });
     } else {
@@ -53,22 +54,25 @@ class PokemonSinglePage extends Component {
     const { description } = this.state;
 
     return (
-      <div>
+      <div className="pokemon-single">
         <h1>{capitalize(name)}</h1>
-        <img src={imageSrc} alt={`${capitalize(name)}`} />
-        <h2>Description</h2>
-        <p>{description}</p>
+        <div className="pokemon-single-heading">
+          <img src={imageSrc} alt={`${capitalize(name)}`} />
+          <p>{description}</p>
+        </div>
+        <div className="pokemon-single-stats">
+          <p>
+          <strong>Base experience:</strong> {base_experience}
+          </p>
+          <p>
+          <strong>Height:</strong> {height}
+          </p>
+          <p>
+          <strong>Weight:</strong> {weight}
+          </p>
+        </div>
         <SimpleList listTitle="Types:" listItems={types} />
         <SimpleList listTitle="Abilities:" listItems={abilities} />
-        <p>
-          <strong>Base experience:</strong> {base_experience}
-        </p>
-        <p>
-          <strong>Height:</strong> {height}
-        </p>
-        <p>
-          <strong>Weight:</strong> {weight}
-        </p>
       </div>
     );
   }

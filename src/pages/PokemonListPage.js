@@ -128,17 +128,19 @@ class PokemonListPage extends Component {
     return (
       <div>
         <Filters toggleFilter={this.toggleTypeFilter} activeFilter={filter} />
-        {filteredPokemon.map(pokemon => (
-          <PokemonListItem
-            key={pokemon.name}
-            pokemon={pokemon}
-            toggleMyPokemon={this.toggleMyPokemon}
-            myPokemon={myPokemonIds.has(pokemon.id)}
-          />
-        ))}
-        {!finishedLoading && (
-          <div ref={this.endRef}>Loading more pokemon...</div>
-        )}
+        <div className="pokemon-list">
+          {filteredPokemon.map(pokemon => (
+            <PokemonListItem
+              key={pokemon.name}
+              pokemon={pokemon}
+              toggleMyPokemon={this.toggleMyPokemon}
+              myPokemon={myPokemonIds.has(pokemon.id)}
+            />
+          ))}
+          {!finishedLoading && (
+            <div ref={this.endRef}>Loading more pokemon...</div>
+          )}
+        </div>
       </div>
     );
   }

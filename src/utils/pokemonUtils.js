@@ -9,7 +9,7 @@ export function adaptPokemonData(pokemonList) {
     return {
       id: pokemon.id,
       name: pokemon.name,
-      base_experience: pokemon.name.base_experience,
+      base_experience: pokemon.base_experience,
       height: pokemon.height,
       weight: pokemon.weight,
       types: pokemon.types.map(type => {
