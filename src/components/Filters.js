@@ -10,10 +10,7 @@ class Filters extends Component {
 
   componentDidMount() {
     loadData(`${apiRoot}type`).then(data => {
-      const types = data.results.map(type => {
-        return type.name;
-      });
-      this.setState({ types });
+      this.setState({ types: data.results });
     });
   }
 
@@ -33,16 +30,18 @@ class Filters extends Component {
 
     return (
       <Fragment>
-        <button onClick={this.toggleOpen} className="filters-header">Filters</button>
+        <button onClick={this.toggleOpen} className="filters-header">
+          Filters
+        </button>
         {open && (
           <div className="filters">
             {types.map(type => (
               <button
-                key={type}
-                className={this.isSelected(type) ? 'active' : ''}
+                key={type.name}
+                className={this.isSelected(type.name) ? 'active' : ''}
                 onClick={() => toggleFilter(type)}
               >
-                {type}
+                {type.name}
               </button>
             ))}
           </div>

@@ -30,7 +30,22 @@ export function adaptPokemonObject(pokemon) {
 
 export function filterPokemon(pokemonList, activeFilter) {
   if (!activeFilter) return pokemonList;
-  return pokemonList.filter(pokemon =>  {
+  return pokemonList.filter(pokemon => {
     return pokemon.types.includes(activeFilter);
-  })
+  });
+}
+
+/**
+ * Filters already loaded pokemon
+ * @param {Array} pokemonIdsList
+ * @param {Array.<Object>} allPokemon
+ * @returns {Array}
+ */
+
+export function filterLoaded(pokemonIdsList, allPokemon) {
+  return pokemonIdsList.filter(pokemonId => {
+    return !allPokemon.find(pokemon => {
+      return pokemon.name === pokemonId;
+    });
+  });
 }

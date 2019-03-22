@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { loadData, fetchPokemon, apiRoot } from '../utils/fetchUtils';
-import { adaptPokemonObject, filterPokemon } from '../utils/pokemonUtils';
+import { filterLoaded, filterPokemon } from '../utils/pokemonUtils';
 import { toggleInSet } from '../utils/generalUtils';
 import PokemonListItem from '../components/PokemonListItem';
 import Filters from '../components/Filters';
@@ -67,19 +67,24 @@ class PokemonListPage extends Component {
       const pokemonIds = data.results.map(result => {
         return result.name;
       });
-      fetchPokemon(pokemonIds).then(allPokemon => {
-        this.setState(prevState => ({
-          allPokemon: prevState.allPokemon.concat(allPokemon)
-        }));
-        if (
-          this.state.allPokemon.length >= this.state.pokemonCount ||
-          !this.state.nextPageUrl
-        ) {
-          this.setState({ finishedLoading: true });
-        }
-      });
+      this.addPokemon(pokemonIds);
     });
   };
+
+  addPokemon(pokemonIds) {
+    const newPokemon = filterLoaded(pokemonIds, this.state.allPokemon);
+    fetchPokemon(newPokemon).then(allPokemon => {
+      this.setState(prevState => ({
+        allPokemon: prevState.allPokemon.concat(allPokemon)
+      }));
+      if (
+        this.state.allPokemon.length >= this.state.pokemonCount ||
+        !this.state.nextPageUrl
+      ) {
+        this.setState({ finishedLoading: true });
+      }
+    });
+  }
 
   toggleMyPokemon = pokemonId => {
     const myPokemon = toggleInSet(this.state.myPokemonIds, pokemonId);
@@ -87,10 +92,17 @@ class PokemonListPage extends Component {
   };
 
   toggleTypeFilter = filter => {
-    if (this.state.filter === filter) {
+    if (this.state.filter === filter.name) {
       this.setState({ filter: null });
     } else {
-      this.setState({ filter });
+      loadData(filter.url).then(data => {
+        const pokemonIds = data.pokemon.map(pokemon => {
+          return pokemon.pokemon.name;
+        });
+        this.addPokemon(pokemonIds);
+      });
+
+      this.setState({ filter: filter.name });
     }
   };
 
@@ -108,6 +120,8 @@ class PokemonListPage extends Component {
       filteredPokemon = filterPokemon(myPokemon, filter);
     }
 
+    const showLoadButton = !finishedLoading && activeTab !== 'myPokemon' && !filter;
+
     return (
       <div>
         <Filters toggleFilter={this.toggleTypeFilter} activeFilter={filter} />
@@ -120,13 +134,11 @@ class PokemonListPage extends Component {
               myPokemon={myPokemonIds.has(pokemon.id)}
             />
           ))}
-          <button
-            className="load-more-button"
-            onClick={this.loadMorePokemon}
-            disabled={finishedLoading}
-          >
-            Load more pokemon
-          </button>
+          {showLoadButton && (
+            <button className="load-more-button" onClick={this.loadMorePokemon}>
+              Load more pokemon
+            </button>
+          )}
         </div>
       </div>
     );
