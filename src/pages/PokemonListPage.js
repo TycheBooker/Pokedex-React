@@ -23,7 +23,7 @@ class PokemonListPage extends Component {
   componentDidMount() {
     this.getLocalData();
     this.loadMorePokemon();
-    // window.addEventListener('beforeunload', this.saveDataToStorage);
+    window.addEventListener('beforeunload', this.saveDataToStorage);
   }
 
   componentWillUnmount() {
