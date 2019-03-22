@@ -1,3 +1,5 @@
+import { adaptPokemonObject } from "./pokemonUtils";
+
 export const apiRoot = 'https://pokeapi.co/api/v2/'
 
 /**
@@ -21,4 +23,21 @@ export function loadData(path) {
     .catch(err => {
       console.error('Fetch Error:', err);
     });
+}
+
+/**
+* Fetch detail view of pokemon from a list
+* @param {Array} pokemonIdsList
+* @returns {Array}
+*/
+
+export async function fetchPokemon(pokemonIdsList) {
+  const promisedPokemonList = pokemonIdsList.map(pokemonId => {
+    return loadData(`${apiRoot}pokemon/${pokemonId}`);
+  });
+  const fullPokemonList = await Promise.all(promisedPokemonList);
+  const adaptedPokemonList = fullPokemonList.map(pokemon => {
+    return adaptPokemonObject(pokemon);
+  });
+  return adaptedPokemonList;
 }

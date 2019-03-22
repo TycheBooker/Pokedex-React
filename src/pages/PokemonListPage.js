@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { loadData, apiRoot } from '../utils/fetchUtils';
+import { loadData, fetchPokemon, apiRoot } from '../utils/fetchUtils';
 import { adaptPokemonObject, filterPokemon } from '../utils/pokemonUtils';
 import { toggleInSet } from '../utils/generalUtils';
 import PokemonListItem from '../components/PokemonListItem';
@@ -22,13 +22,12 @@ class PokemonListPage extends Component {
 
   componentDidMount() {
     this.getLocalData();
-    this.initObserver();
-    window.addEventListener('beforeunload', this.saveDataToStorage);
+    this.loadMorePokemon();
+    // window.addEventListener('beforeunload', this.saveDataToStorage);
   }
 
   componentWillUnmount() {
     this.saveDataToStorage();
-    this.observer.disconnect();
     window.removeEventListener('beforeunload', this.saveDataToStorage);
   }
 
@@ -46,61 +45,41 @@ class PokemonListPage extends Component {
     }
 
     if (localMyPokemon && localMyPokemon.length > 0) {
-      const myPokemonIds = new Set(localMyPokemon)
+      const myPokemonIds = new Set(localMyPokemon);
       this.setState({ myPokemonIds });
     }
   }
 
-  initObserver() {
-    this.observer = new IntersectionObserver(this.onIntersection, {
-      threshold: [0.1]
-    });
-    this.observer.observe(this.endRef.current);
-  }
+  saveDataToStorage = () => {
+    localStorage.setItem('allPokemon', JSON.stringify(this.state.allPokemon));
+    localStorage.setItem(
+      'myPokemon',
+      JSON.stringify(Array.from(this.state.myPokemonIds))
+    );
+  };
 
-  onIntersection = entries => {
-    entries.forEach(entry => {
-      if (entry.intersectionRatio <= 0) {
-        return;
-      }
-
-      this.fetchPokemon().then(allPokemon => {
+  loadMorePokemon = () => {
+    loadData(this.state.nextPageUrl).then(data => {
+      this.setState({
+        nextPageUrl: data.next,
+        pokemonCount: data.count
+      });
+      const pokemonIds = data.results.map(result => {
+        return result.name;
+      });
+      fetchPokemon(pokemonIds).then(allPokemon => {
         this.setState(prevState => ({
           allPokemon: prevState.allPokemon.concat(allPokemon)
         }));
-
         if (
           this.state.allPokemon.length >= this.state.pokemonCount ||
           !this.state.nextPageUrl
         ) {
-          this.observer.disconnect();
           this.setState({ finishedLoading: true });
         }
       });
     });
   };
-
-  saveDataToStorage = () => {
-    localStorage.setItem('allPokemon', JSON.stringify(this.state.allPokemon));
-    localStorage.setItem('myPokemon', JSON.stringify(Array.from(this.state.myPokemonIds)));
-  };
-
-  fetchPokemon() {
-    return loadData(this.state.nextPageUrl).then(async data => {
-      this.setState({
-        nextPageUrl: data.next,
-        pokemonCount: data.count
-      });
-      const promisedPokemonList = data.results.map(pokemon => {
-        return loadData(`${apiRoot}pokemon/${pokemon.name}`);
-      });
-      const fullPokemonList = await Promise.all(promisedPokemonList);
-      const adaptedPokemonList = fullPokemonList.map(pokemon => {
-        return adaptPokemonObject(pokemon);
-      })
-      return adaptedPokemonList;
-    });
-  }
 
   toggleMyPokemon = pokemonId => {
     const myPokemon = toggleInSet(this.state.myPokemonIds, pokemonId);
@@ -141,9 +120,13 @@ class PokemonListPage extends Component {
               myPokemon={myPokemonIds.has(pokemon.id)}
             />
           ))}
-          {!finishedLoading && (
-            <div ref={this.endRef}>Loading more pokemon...</div>
-          )}
+          <button
+            className="load-more-button"
+            onClick={this.loadMorePokemon}
+            disabled={finishedLoading}
+          >
+            Load more pokemon
+          </button>
         </div>
       </div>
     );
